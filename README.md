@@ -1,345 +1,145 @@
-## Day17_180704
+## Day18_180705
 
+- 좋아요 버튼 + 개수 넣고 변화하는것 까지
+- 별점주기 (좋아요버튼에 컬럼을 하나 추가하면 된다.  t.integer :score   )
+- 댓글 (Ajax) 입력 + 삭제 + 수정
 
+  - 댓글입력시 글자제한( front + backend )
+- pagination (kaminari)
+- hastag (제목중복, 아이디중복 찾을 때 ) 자동완성기능?
 
-- jQuery (요소 선택자, 이벤트 리스너)
-  - jQuery는 jQuery CDN으로 가져와야하는거지만, rails에서는 jQuery가 내장되어 있다.
-  - 하지만, rails 5.1버전 이상으로 사용하게 되면 어중간하게 설치가 되어있기때문에 다시 확인해야한다.
-  - `<%= link_to '로그아웃', user_session_destroy_path ,method: 'destroy', data: {confirm: "삭제하시겠습니까?"} %>` 여기에서 `data: {confirm: "삭제하시겠습니까?"} ` 이 부분.
-  - 
 
-```javascript
-> $
-ƒ ( selector, context ) {
-		// The jQuery object is actually just the init constructor 'enhanced'
-		// Need init if jQuery is called (just allow error to be thrown if not included)
-		return new jQuery…
-    
->$("css 선택자")
-jQuery.fn.init [prevObject: jQuery.fn.init(1), context: document, selector: "css 선택자"]		
 
->$(".btn") <= elementsByClassName
-jQuery.fn.init(3) [a.btn.btn-primary, a.btn.btn-primary, a.btn.btn-primary, prevObject: jQuery.fn.init(1), context: document, selector: ".btn"]
+### Ajax 복습
 
->$('button') <- HTML tag를 가져온다.
+- MVVM : 요새 핫한 프론트엔드 자바스크립트 프레임워크
+- 모든화면을 Ajax라고 만들기엔 서버를 항상부르기엔 불편해서 만들어진 기술
+- 처음 `show.html.erb` 에서 url, method, data 를 지정해주고, 이 요청을 받아드릴 `routes` 에 해당 url을 컨트롤러에 지정
+-  `movies_controller` 에서 좋아요랑 좋아요 취소 로직을 설정해주었다. 
+- 액션명과 같은 js를 써주어 서버가 movies_controller에서 like_movie 액션이 동작할때 해당 자바스크립트가 실행되도록한다.
 
-> $('#title') <- 아이디는 유일하게 있어야하기때문에 아이디가 중복이라도 결과값은 한개만 나온다.
-jQuery.fn.init [h1#title, context: document, selector: "#title"]
 
 
-```
-
-jQuery를 사용한 이벤트 적용 방식
-
-
-```javascript
-$('.btn').mouseover(function() {
-    console.log("건들이지마이야이야~");
-});
-
-$('.btn').on('mouseover', function() {
-    console.log("건들이지 말랬지 ㅡㅡ");
-});
-```
-
-> 두번째 방식을 가장 많이 쓰는데 이벤트를 늘려갈수있기 때문에! 많이 사용한다.
-
-
-
-- 마우스가 버튼위에 올라갔을때, 버튼에 있는 btn-primary클래스를 삭제하고, btn-danger 클래스를 준다. 버튼에서 마우스가 내려왔을 때, 다시 btn-danger 클래스를 삭제하고 btn-primary 클래스를 추가한다.
-  - 여러개의 이벤트 등록하기
-  - 요소에 class를 넣고 빼는 jQuery Function을 찾기. => .addClass / .removeClass || 이둘을 합쳐져 있는게 .toogleClass
-
-```javascript
-btn.on('mouseenter mouseout', function() {
-    //두개의 이벤트 리스너, 한개의 이벤트 핸들러
-    
-    
-btn.on('mouseenter mouseout', function() {
-    btn.removeClass("btn-primary").addClass("btn-danger");
-})
-    // 이렇게 하면 btn-danger 로 변하고 끝. 근데 계속 변화시키고싶으니까 danger이 있을때 다시 primary로 바꿔주면 되겠지
-    // .hasClass()로 해당 클래스를 찾아주자
-
-    
-    
-btn.on('mouseenter mouseout', function(){
-    if (btn.hasClass('btn-danger')) {btn.removeClass('btn-danger').addClass('btn-primary');} else { btn.removeClass('btn-primary').addClass('btn-danger'); }});
-    
-    
-    btn.on('mouseenter mouseout', function(){
-    $(this).toggleClass('btn-danger').toggleClass('btn-primary');
-});
-```
-
-> $(this) : 이벤트가 발생한 바로 그 대상을 지칭.
->
-> console.dir(this); -> 바로 html요소가 뜬다.
-> console.dir($(this)); -> jQuery 요소! jQuery메소드를 사용할땐 이렇게 jQuery로 감싸주어야 한다.
-
-> toggle : 있으면 빠지고, 없으면 넣어주니까
-
-
-
-- 버튼에 마우스가 오버되었을때, 상단에 있는 이미지의 속성에 style 속성과 `width: 100px;`의 속성값을 부여한다.
-
-```javascript
-btn.on('mouseover',function() {
-    $('img').attr('style', 'width: 100px;'); }); 
-// 속성값 부여
-
-$('img').attr('style');
- "width: 100px;"
-// 속성값 가져오기 (1개만.)
-```
-
-
-
-- 텍스트 바꾸기 .text()
-
-  - return <- 인자가 있는경우
-  - set <- 인자가 없는경우에는 들어있는 innertext속성을 꺼내온다.
-
-  > $(this).siblings().find("card-title").text("...")
-
-
-
-- 버튼(요소)에 마우스가 오버(이벤트)됬을 때(이벤트 리스너), 이벤트가 발생한 버튼($(this))과 같은 수준(같은 부모를 갖는: siblings())이 아닌 상위 수준(parent()) 에 있는  요소 중에서 `.card-title`의 속성을 가진 친구를 찾아(find()) 텍스트를 변경(text())시킨다.
-
-```javascript
-btn.on('mouseover', function() {
-   $(this).parent().find('.card-title').text("건들이는거 노노");
-});
-
-// find()는 하위수준에서 찾기 때문에 siblings가 아닌 parent()를 사용하여 상위수준으로 올려서 찾아야한다.
-```
-
-
-
-### 놀리기 텍스트 변환기(얼레리 꼴레리)
-
-*index.html*
-
-```html
-<textarea id="input" placeholder="변환텍스트를 입력해주세요"></textarea>
-<button class="translate">바꿔줘</button>
-<h3></h3>
-```
-
-- input에 들어있는 text중에서 '관리' -> '고나리' 로, '확인' -> '호가인' 로 '훤하다' -> '허누하다' 의 방식으로 텍스를 오타로 바꾸는 이벤트핸들러 작성하기
-  - ㅎ ㅜ ㅓ ㄴ 에서 두번째꺼랑 세번째꺼 바꿔주면 된다.
-  - 1. 분해한 글자의 4번째요소가 있는지
-    2.  2번째 3번째 요소가 모음인지
-  - 분리 -> 순서바꾸기 -> 합치기
-
-- https://github.com/e-/Hangul.js 에서 라이브러리를 받아서 자음과 모음을 분리하고 다시 단어로 합치는 기능을 살펴보기.
-- `String.split('')`: `''`안에 있는것을 기준으로 문자열을 잘라준다. (return type: 배열)
-- `.map(function(el){ })` : 배열을 순회하면서 하나의 요소마다 function을 실행시킴 (el : 순회하는 각 요소 ( 가변수 ), return type : 새로운 배열)
-- `Array.join('')` : 배열에 들어있는 내용들을 `''`안에 있는 내용을 기준으로 합쳐준다.
-
-
-
-#### 진행
-
-1. 아톰을 킨다.
-2. html양식을 완료한다 
-3. Hangual.js을 그 폴더에 넣는다.
-4. jQuery CDN을 설치한다
-
-```html
-
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>얼레리 꼴레리</title>
-    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
-  </head>
-  <body>
-    <h1> 놀리기 변환 </h1>
-    <textarea id="input" placeholder="변환텍스트를 입력해주세요"></textarea><br/>
-    <button class="translate">바꿔줘</button>
-    <h3></h3>
-    <script src="./hangul.js" type="text/javascript"></script>
-    <script type="text/javascript">
-      
-    </script>
-  </body>
-</html>
-```
-
-> ​    <script scr="./translate.js" type="text/javascript"></script> 하면 스크립트 내용을 따로 뺄수있다.
-
-
-
-5. textarea에 있는 내용물을 가지고 오는 코드
-
-`    $('#input').val();` : 인자가 없을때는 내용물을 꺼내고, 인자가 있을때는 내용물을 인자값으로 집어넣고.
-
-6. 버튼에 이벤트리스너(click)를 달아주고, 핸들러에는 1번에서 작성한 코드를 넣는다.
-
-```html
-    <script type="text/javascript">
-      $('.translate').on('click', function() {
-        var input = $('#input').val();
-        console.log(input); 
-      })
-    </script>
-```
-
-7. 6번 코드의 결과물을 한글자씩 분해해서 배열로 만들어준다.
-
-`console.log(Hangul.disassemble(input));`
-
-8. 분해한 글자의 4번째요소가 있는지 && 2번째 3번째 요소가 모음인지
-9. 2번째 3번재 모음의위치를 바꾸어준다.
-10. 결과물로 나온 배열을 문자열로 이어준다(join 사용)
-
-*translate.js*
-
-```javascript
-function translate(str){
-  return str.split('').map(function(el){ //map : 하나씩 돌아가면서 조작
-    // el. 을 가지고 조작합니다
-    var d = Hangul.disassemble(el);
-    console.log(d)
-    if(d[3] && Hangul.isVowel(d[1]) && Hangul.isVowel(d[2])){
-    var temp = d[2];
-    d[2] = d[3];
-    d[3] = temp;
-
-    }
-      return Hangul.assemble(d);
-    }).join('');
-}
-
-```
-
-11. 결과물을 출력해줄 요소를 찾는다. 
-12. 요소에 결과물을 출력한다. -> 다음 결과물을 h2태그에 배치한다.
-
-```html
-<script src="./translate.js"></script>
-<script type="text/javascript">
-      $('.translate').on('click', function() {
-        var input = $('#input').val();
-	    var result = translate(input);
-        $('h3').text(result);
-        console.log(result);
-      })
-</script>
-```
-
-
-
-### Ajax
-
-translate.js 에 있는 Function을 사용해보았다. 그렇다면 서버에 있는 액션은 어떻게 사용해야할까?
-
-client < - > server (-> res 즉, 응답방식이 HTML이였을땐 화면전환이 있었다.) rails는 임의로 정해주지 않는한 req 와 res 의 파일은 같은 형식을 띈다. 즉, javascript로 응답을 보내면 페이지 전환이 있는것이 아니라, 어떠한 액션! 을 넣어주는것. 화면전환없이 서버에 요청을 보내고, 응답을 받을수있기 때문에 많이 사용한다.
-
-즉, 서버에 요청을 javascript 타입으로 보내는것이 AJAX라고 할수있다.
-
->  rails 에서는 어느 메소드(액션)으로 보낼지 (=> routes )
->
-> Ajax 에서 어디로 어떻게 보낼지 (=> url , Http method)
-
-```javascript
-$.ajax({
-    url: 어느주소로 요청을 보낼지,
-    method: 어떠한 HTTP method로 요청을 보낼지,
-    data: {
-    k: v 어떤 값을 함께 보낼지 (k,v로 구성),
-   	// 서버에서는 params[k] => v
-    
-	}
-}
-```
-
-
-
-
-
-- 좋아요 옵션 만들기
-- 유저와 영화의 좋아요관계는 다대다 이므로 => 
-  1. 모델생성
-
-`binn02:~/watcha_app (master) $ rails g model like`
-
-*~/watcha_app/db/migrate/20180704061215_create_likes.rb.rb*
-
-```ruby
-      t.integer :user_id
-      t.integer :movie_id
-```
-
-2. 관계설정
-
-*like.rb*
-
-```ruby
-    belongs_to :user
-    belongs_to :movie
-```
-
-`movie.rb` 와` user.rb` 에서는 `has_many :likes` 랑     `has_many :users, through: :likes`해야하는데 이미 유저랑 무비가 다대다니까 중복이되쟈나
-
-<< 해결방법 >>
-
-1. 작성자이름만 movie가 갖게하여 다대다를 끊어주는거
-2. 다대다 관계를 느슨하게 > movie.likes.count 로 세어주기만 하는 방법이 있어
-
-
-
-1번 방법을 사용하였다.
-
-*user.rb*
-
-```ruby
-  has_many :likes
-  has_many :movies, through: :likes
-```
-
-*movie.rb*
-
-```ruby
-    has_many :likes
-    has_many :users, through: :likes
-```
-
-
-
-script는 동적으로 불러와진다. 특정 버튼에 이벤트를 넣을때,  페이지가 완전히 다 로딩되었는지 알려주는 코드가 필요하다.
+### 좋아요 버튼 + 개수
 
 *show.html.erb*
 
 ```ruby
-...
-    
-<script>
-    $(document).on('ready',function(){
-        
-    });
-</script>
+<h1><%= @movie.title %></h1>
+<hr>
+<p> <%=@movie.description %></p>
+<hr>
 
-```
-
-> 문서가 다 로드됬을때 이벤트를 사용하겠다.	
-
-1. 좋아요 버튼을 눌렀을때
-
-```ruby
+<%= link_to 'Edit', edit_movie_path(@movie) %> |
+<%= link_to 'Back', movies_path %>  | 
+<% if @user_likes_movie.nil? %>
+<button class="btn btn-info like">좋아요 (<span class="like-count"><%= @movie.likes.count %></span>)</button>
+<% else %>
+<button class="btn btn-warning like">좋아요 취소 (<span class="like-count"><%= @movie.likes.count %></span>)</button>
+<% end %>
 <script>
     $(document).on('ready',function(){
         $('.like').on('click', function(){
-            
+            console.log("like~!") // 확인용
+            $.ajax({
+               url: '/likes/<%= @movie.id %>' 
+            });
         })
     });
 </script>
 ```
 
+*like-movie.js.erb*
+
+```javascript
+var like_count = parseInt($('.like-count').text());
+console.log(like_count);
+//좋아요가 취소된 경우
+// 좋아요 취소버튼 -> 좋아요 버튼으로 바꿔준다.
+if (<%= @like.frozen? %>) {
+    like_count  = like_count - 1
+    $('.like').html(`좋아요(<span class='like-count'>${like_count}</span>)`).removeClass('btn-warning').addClass('btn-info'); // string Interpolation
+}else{
+//좋아요가 새로눌린 경우
+// 좋아요 버튼 -> 좋아요 취소버튼으루~!~!
+    alert("좋아요 설정되쩡!");
+    like_count = like_count + 1
+    $('.like').html(`좋아요 취소(<span class='like-count'>${like_count}</span>)`).removeClass('btn-info').addClass('btn-warning');
+}
+```
+
+> => parseInt($('.like-count').text());
+>
+> => string Interpolation 얘는 `로 쓰면 여러줄도 가능 (줄바꿈가능)
+>
+> 변수명에 - 은 안된다. _ (under score은 가능)
+
+*movies_controller.rb*
+
+```ruby
+ def show
+    if user_signed_in?
+      @user_likes_movie = Like.where(user_id: current_user.id, movie_id: @movie.id).first
+    else
+      @user_likes_movie =[]
+ end
+```
 
 
-2. 서버에 요청을 보낸다. (현재 유저와 현재 보고있는 이 영화가 좋다고 하는 요청)
+
+### 댓글 입력 & 삭제
+
+- 댓글을 입력받을 폼을 작성
+
+*~/watcha_app/app/views/movies/show.html.erb*
+
+```ruby
+...
+<form class="text-right comment">
+    <input class="form-control comment-contents"><<br/>
+    <input type="submit" value="댓글쓰기" class="btn btn-success">
+</form
+
+<ul class="list-group comment-list">
+    <!--<li class="list-group-item">Cras justo odio</li>-->
+</ul>
+...
+```
+
+
+
+- form(요소)이 제출(이벤트)될때 (이벤트 리스너)
+
+*~/watcha_app/app/views/movies/show.html.erb*
+
+```ruby
+...
+<script>
+    $(document).on('ready',function(){
+        $('.like').on('click', function(){
+            console.log("like~!") // 확인용
+            $.ajax({
+               url: '/likes/<%= @movie.id %>' 
+            });
+        })
+        $('.comment').on('submit', function(e){
+            e.preventDefault();   
+            # 실제로<input type="submit"> 여기에서 page redirection이 진행되어 기존 댓글이 사라진다. 그러므로 이를 페이지 리디렉션을 방지하기위해 사용. 값이 log로 넘어오는것을 볼수있다.
+            var comm = $('.comment-contents').val();
+            console.log(comm);
+        });
+    });
+</script>
+...
+```
+
+
+
+- form에 input(요소) 안에 있는 내용물(메소드)을 받아서
+
+[jquery add element to element][http://api.jquery.com/append/]
+
+*~/watcha_app/app/views/movies/show.html.erb*
 
 ```ruby
 <script>
@@ -347,44 +147,487 @@ script는 동적으로 불러와진다. 특정 버튼에 이벤트를 넣을때,
         $('.like').on('click', function(){
             console.log("like~!") // 확인용
             $.ajax({
-               url: '/likes' 
+               url: '/likes/<%= @movie.id %>' 
             });
         })
+        $('.comment').on('submit', function(e){
+            e.preventDefault();
+            var comm = $('.comment-contents').val();
+            console.log(comm);
+            $('.comment-list').append(comm);
+        });
+    });
+</script>
+```
+
+한줄씩 쓰게 하기 위해서 다음의 코드로 수정한다.
+
+```겨ㅠㅛ
+ $('.comment-list').append(`<li class="list-group-item">${comm}</li>`);
+ $('.comment-contents').val(''); // 댓글입력창에 존재하는 값 날리기용
+```
+
+하지만, 첫번째 쓴것을 맨위에 올리기위해 `.append` 가 아닌 `.prepend`로 사용한다.
+
+- *comment model 만들기*
+  - column : user_id, movie_id, contents
+  - association :
+    - movie(1) - comment (N)
+    - user(1) - comment(N)
+  - url("/movies/:movie_id/comments", method: post)인 ajax 코드 짜보기
+
+```ruby
+<h1><%= @movie.title %></h1>
+<hr>
+<p> <%=@movie.description %></p>
+<hr>
+
+<%= link_to 'Edit', edit_movie_path(@movie) %> |
+<%= link_to 'Back', movies_path %>  | 
+<% if @user_likes_movie.nil? %>
+<button class="btn btn-info like">좋아요 (<span class="like-count"><%= @movie.likes.count %></span>)</button>
+<% else %>
+<button class="btn btn-warning like">좋아요 취소 (<span class="like-count"><%= @movie.likes.count %></span>)</button>
+<% end %>
+<hr>
+
+<form class="text-right comment">
+    <input class="form-control comment-contents"><br/>
+    <input type="submit" value="댓글쓰기" class="btn btn-success">
+</form>
+<hr>
+<h3>댓글</h3>
+<ul class="list-group comment-list">
+    <!--<li class="list-group-item">Cras justo odio</li>-->
+</ul>
+<hr>
+<script>
+    $(document).on('ready',function(){
+        $('.like').on('click', function(){
+            console.log("like~!") // 확인용
+            $.ajax({
+               url: '/likes/<%= @movie.id %>' 
+            });
+        })
+        $('.comment').on('submit', function(e){
+            e.preventDefault();
+            var comm = $('.comment-contents').val();
+            console.log(comm);
+            $.ajax({
+                url: '/movies/<%= @movie.id %>/comments',
+                data: {contents: comm},
+                method: 'post'
+            });
+            $('.comment-list').prepend(`<li class="list-group-item">${comm}</li>`);
+            $('.comment-contents').val(''); // 값날리기용
+        });
+        
+        
     });
 </script>
 
+
 ```
 
-*routes.rb* 에  ` get '/likes' => 'movies#like_movie'` 해주면 이런 에러가 뜬다
+ ! 라우팅 참고 =>  [Nested Resources](http://guides.rubyonrails.org/routing.html#nested-resources)
 
-AbstractController::ActionNotFound (The action 'like_movie' could not be found for MoviesController): 
+*routes.rb*
 
-*movie_controller* 에 `   def like_movie end` 써준다. 이거와 같은이름의 `like_movie.js` 에서 alert하면 저 def가 실행될때 자동으로 같은이름의 자바스크립트도 읽을수있다.
+```ruby
+    member do
+      get '/comments' => 'movies#create_comment'
+    end
+```
 
-하지만, 로그인하지않고 좋아요버튼을 누르면 401에러가 뜬다. -> 해결하기 위해서 filter를 설정
+=> comments_movie GET    /movies/:id/comments(.:format) movies#create_comment 
 
-*movie_controller* 에서 `  before_action :js_authenticate_user!, only: [:like_movie]` 쓰기위해서!! *application_controller* 에서 `s_authenticate_user!` 를 설정했다.
+이렇게 된다.
 
-1. 서버가 할 일
-2. 응답이 오면 좋아요 버튼의 텍스트를 좋아요 취소로 바꾸고 `btn-info` -> `btn-warning text-whitle`로 바꿔준다.
+`AbstractController::ActionNotFound (The action 'create_comment' could not be found for MoviesController): ` controller에 액션이 없기 때문에 에러일것이다.
 
-```javascript
-alert("좋아요 설정되쩡!");
+- 보낼때에는 내용물, 현재보고있는 movie의 id값도 같이 보낸다
+
+*movies_controller*
+
+```ruby
+ before_action :set_movie, only: [:show, :edit, :update, :destroy, :create_comment]
+
+  def create_comment
+    #  @movie = Movie.find(params[:id]) <- set_movie 랑 같으니까
+    @comment =Comment.create(user_id: current_user.id, movie_id: @movie.id, contents: params[:contents])
+      	   #  @comment =Comment.create(user_id: current_user.id, movie_id: @movie.id)랑
+           # movie.comments.new(user_id: current_user.id).save 와 같은 말
+  end
+```
+
+이렇게 컨트롤러에서 넘기는 contents 는 *show.html.erb* 에 있는 `  data: {contents: comm},` 라는 Ajax의 코드로 데이터가 넘어온다.
 
 
-//좋아요가 취소된 경우
-// 좋아요 취소버튼 -> 좋아요 버튼으로 바꿔준다.
-if (<%= @like.frozen? %>) {
-$('.like').text("좋아요").toggleClass("btn-info btn-warning text-white");
 
+- 서버에서 저장하고 response로 보내줄 js.erb 파일을 작성한다.
 
-}else{
-//좋아요가 새로눌린 경우
-// 좋아요 버튼 -> 좋아요 취소버튼으루~!~!
+*~/watcha_app/app/views/movies/create_comment.js.erb* 파일을 생성하고, 안에 *show.html.erb*에 있던 댓글 작성기능 코드를 잘라온다
 
-$('.like').text("좋아요 취소").toggleClass("btn-info btn-warning text-white");
-}
+```ruby
+$('.comment-list').prepend(`<li class="list-group-item"><%= @comment.contents %></li>`);
+$('.comment-contents').val(''); // 값날리기용
+alert('댓글 등록이 완료되었습니다.');
 ```
 
 
 
+- js.erb 파일에서는 댓글이 표시될 영역에 등록된 댓글의 내용을 추가해준다.
+
+*show.html.erb* 에 기존에 등록되어있는 댓글을 출력하는 코드
+
+```ruby
+<ul class="list-group comment-list">
+    <!--기존에 등록되어있는 댓글 출력-->
+    <% @movie.comments.reverse.each do |comment| %>
+        <li class="list-group-item d-flex justify-content-between"><%= comment.contents %> ( <%= comment.user.email %> )
+    <button class="btn btn-danger">삭제</button></li>
+    <% end %>
+</ul>
+```
+
+[정렬-부트스트랩][https://getbootstrap.com/docs/4.1/utilities/flex/#justify-content]
+
+- 댓글에 있는 삭제버튼(요소)을 누르면(이벤트 리스너) 해당 댓글이 눈에 안보이게 되고, (이벤트 핸들러)
+
+  *views/movies/show.html.erb*
+
+```ruby
+<script>
+    ...
+		$('.destroy-comment').on('click', function(){
+            console.log("destroyed!!!!");   
+            $(this).parent().remove();
+        });
+	...
+</script>	
+```
+
+> button을 감싸는 태그의 바로 상위태그(<li>) 불러오는거 => parent
+>
+> 상위태그 모두 다 불러오려면 =>parents 
+>
+> parents().find() 이런식으로도 쓸수는 있겠지.
+
+- 실제 db에서도 삭제가 된다.(ajax코드)
+
+  ```ruby
+  <ul class="list-group comment-list">
+      <!--<li class="list-group-item">Cras justo odio</li>-->
+      <!--기존에 등록되어있는 댓글 출력-->
+      <% @movie.comments.reverse.each do |comment| %>
+          <li class="list-group-item d-flex justify-content-between">
+              <%= comment.contents %> ( <%= comment.user.email %> )
+          <button data-id="<%= comment.id %>" class="btn btn-danger destroy-comment">삭제</button></li>
+      <% end %>
+  </ul>
+  <hr>
+  <script>
+  ...
+          $('.destroy-comment').on('click', function(){
+              console.log("destroyed!!!!");   
+              $(this).parent().remove();
+              var comment_id = $(this).attr('data-id');
+            //  $(this).data('id'); //이렇게도 뽑아낼수있으data-id로 썼던 이유.
+            console.log(comment_id);
+              $.ajax({
+                  url: "/movies/comments/" + comment_id //resouceful routing,
+                  method: "delete"
+              })
+          });
+      });
+  </script>
+  ```
+
+  > GET https://my-second-rails-app-binn02.c9users.io/movies/comments/4 404 (Not Found) 라는 에러뜬다.
+  >
+  > 왜냐하면 저 url로 연결되는게 없기 때문이다.
+
+  *routes.rb*
+
+  ```ruby
+      collection do
+        delete '/comments/:comment_id' => 'movies#destroy_comment'
+      end
+  ```
+
+  > 이러면 또 액션이 없어서 에러난다.
+
+  *movies_controller.rb*
+
+  ```ruby
+    def destroy_comment
+       @comment = Comment.find(params[:comment_id]).destroy
+    end
+  ```
+
+  액션이 실행될때만 js를 돌려주기 위해서 파일을 분리하자
+
+  *destroy_comment.js.erb*
+
+  ```ruby
+  alert("댓글이 삭제되었습니다.");
+  $('.comment-<%=@comment.id %>').remove();
+  ```
+
+  *show.html.erb*
+
+  ```ruby
+  <li class="comment-<%= comment.id %> // parent로 안하고 바로 받기위해서 class설정
+  ```
+
+- 새로 등록하는 댓글들에는 삭제버튼이 안나오는 에러를 해결하자
+
+*~/watcha_app/app/views/movies/create_comment.js.erb*
+
+```ruby
+$('.comment-list').prepend(`<li class="comment-<%= @comment.id %> list-group-item d-flex justify-content-between">
+            <%= @comment.contents %> ( <%= @comment.user.email %> )
+            <button data-id="<%= @comment.id %>" class="btn btn-danger destroy-comment">삭제</button>
+            </li>`);
+$('.comment-contents').val(''); // 값날리기용
+alert('댓글 등록이 완료되었습니다.');
+```
+
+> 아 근데 또 문제있어
+>
+> 새로 등록한 댓글에 삭제버튼이 동작하지 않는다. <- 자바스크립트로 추가된 친구는  `$('.destroy-comment').on('click', function(){` 얘가 동작하지 않는다
+
+*show.html.erb*
+
+```ruby
+  $(document).on('click','.destroy-comment', function(){ 
+            console.log("destroyed!!!!");   
+            var comment_id = $(this).attr('data-id');
+          //  $(this).data('id'); //이렇게도 뽑아낼수있으data-id로 썼던 이유.
+          console.log(comment_id);
+            $.ajax({
+                url: "/movies/comments/" + comment_id, //resouceful routing
+                method: "delete"
+            })
+        });
+```
+
+> `  $(document).on('click','.destroy_comment', function(){ ` : dom-tree를 다시 읽어서 '.destroy_comment'를 찾자. (쉼표로 끊어주었기에 목적지를 지정한거라 생각하자 )
+>
+> 이거는 *create_comment.js.erb* 에서 버튼의 클래스가 ` class="btn btn-danger destroy-comment` 이기때문에!
+
+
+
+### 댓글수정
+
+```ruby
+<li class="comment-<%= comment.id %> list-group-item d-flex justify-content-between">
+   <span class="comment-detail"><%= comment.contents %></span>
+     <div>
+      <button data-id="<%= comment.id %>" class="btn btn-warning text-white edit-comment">수정</button>
+       <button data-id="<%= comment.id %>" class="btn btn-danger destroy-comment">삭제</button>
+     </div>
+</li>
+                        
+...
+                        
+ <script>
+	..
+	$('.edit-comment').on('click', function() {
+           var detail = $('.comment-detail').text();
+           console.log(detail);
+        });
+    ..
+</script>
+```
+
+> 이거는 모든 댓글들을 다 합쳐서 보여준다
+
+
+
+- 수정버튼(요소)을 클릭하면 (이벤트 리스너) 댓글이 있던 부분이 입력창으로 바뀌면서 원래 있던 댓글의 내용이 입력창에 들어간다.(이벤트 핸들러)
+
+- 수정버튼은 확인 버튼으로 바뀐다.
+
+*show.html.erb*
+
+```ruby
+<li class="comment-<%= comment.id %> list-group-item d-flex justify-content-between">
+  <span class="comment-detail-<%= comment.id%>"><%= comment.contents %></span>
+      <div>
+        <button data-id="<%= comment.id %>" class="btn btn-warning text-white edit-comment">수정</button>
+        <button data-id="<%= comment.id %>" class="btn btn-danger destroy-comment">삭제</button>
+      </div>
+</li> 
+...
+<script>
+  $(document).on('click','.edit-comment', function() { //수정버튼(요소)을 클릭하면
+       
+        var comment_id = $(this).data('id');
+        var edit_comment = $(`.comment-detail-${comment_id}`);
+        var contents = edit_comment.text().trim();
+        edit_comment.html(`
+        <input type="text" value="${contents}" class="form-control edit-comment-${comment_id}">`);
+            //(이벤트 리스너) 댓글이 있던 부분이 입력창으로 바뀌면서원래 있던 댓글의 내용이 입력창에 들어간다.(이벤트 핸들러)
+          $(this).text("확인").removeClass("edit-comment btn-warning").addClass("update-comment btn-dark"); //수정버튼은 확인 버튼으로 바뀐다.
+        });
+...               
+</script>
+```
+
+>     //   console.log($(this).parent().parent().find('.comment-detail'))); //li 에서 comment-detail을 찾기위해서
+>     //  하지만 넘 거지같으므로  <span class="comment-detail-<%= comment.id%>"> 를 걍 해준다
+
+
+
+---------
+
+
+
+- 내용 수정 후 확인버튼을 클릭하면 입력창에 있던 내용물이 댓글의 원래 형태로 바뀌고 확인버튼은 다시 수정버튼으로 바뀐다.
+
+```ruby
+<script>
+    ...
+	  $(document).on('click','.update-comment' ,function(){ // 내용 수정 후 확인버튼을 클릭하면
+           console.log("update"); 
+          var comment_id = $(this).data('id');
+          var comment_form = $(`.edit-comment-${comment_id}`)
+        //  console.log(comment_form.val());
+          var edit_comment = $(`.comment-detail-${comment_id}`);
+          edit_comment.html(comment_form.val()); //입력창에 있던 내용물이 댓글의 원래 형태로 바뀌고
+            $(this).text("수정").removeClass("update-comment btn-dark").addClass("edit-comment btn-warning"); //확인버튼은 다시 수정버튼으로 바뀐다.
+        });
+	...
+</script>
+```
+
+
+
+- 입력창에 있던 내용물을 Ajax로 서버에 요청을 보낸다.
+
+```ruby
+       $.ajax({
+                url: "/movies/comments/" + comment_id,
+                data:{contents: comment_form.val()},
+                method: "PATCH"
+            })
+```
+
+> 404 (Not Found) 에러 발생 한다.
+
+- 서버에서는 해당 댓글을 찾아 내용을 업데이트 한다.
+
+*routes.rb*
+
+```ruby
+    collection do
+      patch '/comments/:comment_id' => 'movies#update_comment'
+    end
+```
+
+*movie_controller.rb*
+
+```ruby
+  def update_comment
+    @comment = Comment.find(params[:comment_id])
+    @comment.update(contents: params[:contents])
+  end
+```
+
+> `@comment = Comment.find(params[:comment_id]).update(contents: params[:contents])` 로 하면 
+>
+> @comment에 T / F 형태로 담긴다.
+
+*update_comment.js.erb*
+
+```ruby
+alert("수정이 완료되었습니다.");
+var edit_comment = $('.comment-detail-<%=@comment.id%>');
+edit_comment.html('<%= @comment.contents %>');
+$('.update-comment').text("수정").removeClass("update-comment btn-dark").addClass("edit-comment btn-warning");
+```
+
+-------------
+
+#### 수정 문제 2가지
+
+1. 새글에 수정버튼이 없다
+
+*show.html.erb*
+
+```ruby
+ <li class="comment-<%= comment.id %> list-group-item d-flex justify-content-between">
+           <span class="comment-detail-<%= comment.id%>"><%= comment.contents %></span>
+            <div>
+                <button data-id="<%= comment.id %>" class="btn btn-warning text-white edit-comment">수정</button>
+                <button data-id="<%= comment.id %>" class="btn btn-danger destroy-comment">삭제</button>
+            </div>
+</li>    
+```
+
+이 부분을 복사해서 *create_comment.js.erb* 에서 지역변수로만 바꿔서 적용해주자
+
+*create_comment.js.erb*
+
+```ruby
+$('.comment-list').prepend(`<li class="comment-<%= @comment.id %> list-group-item d-flex justify-content-between">
+           <span class="comment-detail-<%= @comment.id%>"><%= @comment.contents %></span>
+            <div>
+                <button data-id="<%= @comment.id %>" class="btn btn-warning text-white edit-comment">수정</button>
+                <button data-id="<%= @comment.id %>" class="btn btn-danger destroy-comment">삭제</button>
+            </div>
+        </li>`);
+$('.comment-contents').val(''); // 값날리기용
+alert('댓글 등록이 완료되었습니다.');
+```
+
+> 사실 이것을 렌더로 처리하면 더 쉽고 간편해진다!!
+>
+> interpolation을 안써도 멀티라인으로 코드를 쓰려면 `` 를 써야한다.
+
+
+
+2. 수정버튼이 여러개 열린다.
+
+- 수정 버튼을 누르면 
+- 전체 문서 중에서 `update-comment` 클래스를 가진 버튼 이 있는 경우 진행을 이벤트 핸들러를 끝내고 `return false;`, 하지 말자 라고 alert을 띄어주자
+
+```ruby
+$(document).on('click','.edit-comment', function() {
+	var comment_id = $(this).data('id');
+	var edit_comment = $(`.comment-detail-${comment_id}`);
+	var contents = edit_comment.text().trim();
+	var confirm_button = $('.update-comment').length;
+	console.log(confirm_button);
+        if(confirm_button > 0){
+            alert("수정 버튼은 한개만 눌러주세요.");
+            return false;
+        }else{
+        edit_comment.html(`
+        <input type="text" value="${contents}" class="form-control edit-comment-${comment_id}">`);
+        $(this).text("확인").removeClass("edit-comment btn-warning").addClass("update-comment btn-dark");    
+        }});
+```
+
+
+
+
+
+
+
+#### ORM을 사용하는 이유 
+
+: db에 있는 친구들을 객체로 쓰듯이 쓰려고 ! 
+
+- 현재유저가 등록한 댓글들
+
+  : current_user.comments
+
+- 영화 하나가 가지고 있는 댓글들
+
+  : movie.comments
+
+- 코멘트 하나에 달린 무비
+
+  : comment.movie
